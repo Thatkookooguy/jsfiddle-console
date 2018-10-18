@@ -8,13 +8,21 @@
         clear: window.console.clear,
     };
 
-    function append (message) {
-        if (document.body) {
-            document.body.append(message);
-        }
-        else {
-            setTimeout(append, 100, message);
-        }
+    function append (message, type) {
+      let element = $('#kb-console-log');
+      
+      if (!element || !element.length) {
+        element = $(`
+<div id="kb-console-log"></div>
+`).appendTo('body');
+      }
+      
+      element.append(`
+<div class="kb-${ type }">
+<span class="time">[${ new Date().toUTCString() }]</span>
+<span class="type">[${ type }]</span>
+${ message }
+</div>`);
     }
 
     function clear () {
@@ -31,15 +39,15 @@
         return $message;
     }
 
-    function write (key, color) {
+    function write (key) {
         return function () {
             Function.prototype.apply.call(_methods[key], _console, arguments);
-            append(message(Array.prototype.slice.call(arguments).join(' '), color));
+            append(Array.prototype.slice.call(arguments).join(' '), key);
         };
     }
 
     window.console.clear = clear;
-    window.console.error = write('error', '#ff0000');
+    window.console.error = write('error');
     window.console.log = write('log');
     window.console.info = write('info');
     window.console.debug = write('debug');
